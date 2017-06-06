@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 
 namespace DynamicQuery
 {
@@ -15,5 +16,17 @@ namespace DynamicQuery
          * 
          * 
          */
+
+            /// <summary>
+            /// TESTING METHOD ONLY, DO NOT USE THIS IN PRODUCTION
+            /// </summary>
+            /// <param name="query"></param>
+            /// <returns></returns>
+        public DataTable consoleSelect(String query)
+        {
+            Console.WriteLine(query);
+
+            return null;
+        }
     }
 }

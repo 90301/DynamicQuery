@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Text;
 
 namespace DynamicQuery
 {
     public class QueryHolder
     {
+        public static QuerySelectDelegate howDoISelect { get; set; }
         /// <summary>
         /// Holds information to create a sql query
         /// Key is object name or collection name [Usually statically defined once per object]
@@ -15,6 +17,8 @@ namespace DynamicQuery
         public static Dictionary<String,QueryMetadata> QueryMetadata = new Dictionary<string, QueryMetadata>();
     }
 
+    public delegate DataTable QuerySelectDelegate(String query);
+
 
     public class QueryMetadata
     {
@@ -23,8 +27,10 @@ namespace DynamicQuery
         /// Key is the actual variable name such as SSN
         /// </summary>
         public Dictionary<String,ColVariable> colInfo = new Dictionary<string, ColVariable>();
+
+
         /// <summary>
-        /// Holds Join Conditions for larger selects across multiple
+        /// Holds Join Conditions for larger selects across multiple tables
         /// </summary>
         public Dictionary<String, JoinTable> JoinTables { get; set; }
 
@@ -33,6 +39,75 @@ namespace DynamicQuery
         /// </summary>
         public string BaseTable { get; set; }
 
+        public  string ObjName { get; set; }
+
+
+        public QueryMetadata(string objName, string baseTable)
+        {
+            this.ObjName = objName;
+            this.BaseTable = baseTable;
+        }
+
+        public void addCol(ColVariable colVariable)
+        {
+            colInfo[colVariable.ColName] = colVariable;
+        }
+
+        public T getCol<T>(T realVariable, ColVariable nameColVariable)
+        {
+            if (realVariable != null)
+            {
+                //Value already exists, return the value
+                return realVariable;
+            }
+            else
+            {
+                //Variable doesn't exist. May be null, or col might not have been selected yet.
+                if (nameColVariable.Selected)
+                {
+                    //Variable has been selected, value is just null
+                    return realVariable;
+                }
+                else
+                {
+                    //variable hasn't been selected, Do a basic select and add to Query Metadata selected columns
+                    String query = SelectSingleCol(nameColVariable);
+
+
+                }
+            }
+        }
+
+        public string SelectSingleCol(ColVariable colVariable)
+        {
+            String queryOutput = "SELECT " + colVariable.ColName;
+            queryOutput += " FROM " + getFullTable();
+
+            return queryOutput;
+        }
+
+        /// <summary>
+        /// Gets the base table with all joins
+        /// Another method may be added later that gets the efficient table
+        /// with joins only occuring where it is relevant.
+        /// </summary>
+        /// <returns></returns>
+        public string getFullTable()
+        {
+            String queryOutput = BaseTable;
+            foreach (JoinTable joinTable in JoinTables.Values)
+            {
+                queryOutput += joinTable.TableName + joinTable.getConditions();
+            }
+            return queryOutput;
+
+        }
+
+        public string getEfficentTable()
+        {
+            //NOT YET IMPLEMENTED
+            return "GET EFFICIENT TABLE NOT YET IMPLEMENTED";
+        }
     }
 
     public class JoinTable
@@ -91,6 +166,17 @@ namespace DynamicQuery
             joinCondition +=  Metadata.BaseTable + "." + colName + " = " + this.TableName + "." + colName;
 
             JoinConditions.Add(joinCondition);
+        }
+
+        public string getConditions()
+        {
+            String queryJoinConditions = "ON ";
+            foreach (String joinCondition in JoinConditions)
+            {
+                queryJoinConditions += joinCondition + " ";
+            }
+
+            return queryJoinConditions;
         }
     }
 }

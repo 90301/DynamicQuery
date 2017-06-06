@@ -7,31 +7,25 @@ namespace DynamicQuery
     /// <summary>
     /// Holds metadata for a column / Variable
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     public class ColVariable
     {
-        /// <summary>
-        /// The name of the object that holds this variable
-        /// </summary>
-        public string objectName { get; set; }
+        public QueryMetadata Qmd;
+
         /// <summary>
         /// The name of the table's column name
         /// </summary>
-        public string colName { get; set; }
+        public string ColName { get; set; }
 
-        /// <summary>
-        /// the table the variable comes from
-        /// Only important when dealing with joins
-        /// </summary>
-        public string tableName { get; set; }
+        public Boolean Selected { get; set; } = false;
 
-        //public  T objValue { get; set; }
 
-        public ColVariable(String objName,String tableName,String colName)
+        public ColVariable(string colName, QueryMetadata qmd)
         {
-            this.objectName = objName;
-            this.tableName = tableName;
-            this.colName = colName;
+            this.ColName = colName;
+            this.Qmd = qmd;
+
+            this.Qmd.addCol(this);
         }
+
     }
 }
