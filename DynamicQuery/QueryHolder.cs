@@ -9,6 +9,8 @@ namespace DynamicQuery
         /// <summary>
         /// Holds information to create a sql query
         /// Key is object name or collection name [Usually statically defined once per object]
+        /// 
+        /// Attempt to make "Type"
         /// </summary>
         public static Dictionary<String,QueryMetadata> QueryMetadata = new Dictionary<string, QueryMetadata>();
     }
@@ -26,6 +28,9 @@ namespace DynamicQuery
         /// </summary>
         public Dictionary<String, JoinTable> JoinTables { get; set; }
 
+        /// <summary>
+        /// First Table
+        /// </summary>
         public string BaseTable { get; set; }
 
     }
