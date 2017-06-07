@@ -72,7 +72,8 @@ namespace DynamicQuery
                 {
                     //variable hasn't been selected, Do a basic select and add to Query Metadata selected columns
                     String query = SelectSingleCol(nameColVariable);
-
+                    DataTable dataTable = QueryHolder.howDoISelect(query);
+                    //continue here
 
                 }
             }

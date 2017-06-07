@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DynamicQuery;
 
+
 namespace DynamicQueryTesting
 {
     class TestObj
@@ -21,7 +22,7 @@ namespace DynamicQueryTesting
 
         static TestObj()
         {
-           QueryHolder.howDoISelect = QuerySelectDelegate; 
+           QueryHolder.howDoISelect = DynamicQueryMain.consoleSelect; 
         }
     }
 

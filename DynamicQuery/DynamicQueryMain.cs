@@ -22,7 +22,7 @@ namespace DynamicQuery
             /// </summary>
             /// <param name="query"></param>
             /// <returns></returns>
-        public DataTable consoleSelect(String query)
+        public static  DataTable consoleSelect(String query)
         {
             Console.WriteLine(query);
 
