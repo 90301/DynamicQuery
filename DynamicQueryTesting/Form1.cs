@@ -15,6 +15,10 @@ namespace DynamicQueryTesting
         public Form1()
         {
             InitializeComponent();
+
+            TestObj testObj;
+            testObj = new TestObj();
+            Console.WriteLine(testObj.Name);
         }
     }
 }

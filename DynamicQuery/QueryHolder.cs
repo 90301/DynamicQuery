@@ -19,6 +19,7 @@ namespace DynamicQuery
 
     public delegate DataTable QuerySelectDelegate(String query);
 
+    public delegate ICollection<T> LoadCollectionDelegate<T>(DataTable queryResultDataTable,ICollection<T> loadTo);
 
     public class QueryMetadata
     {
@@ -73,7 +74,10 @@ namespace DynamicQuery
                     //variable hasn't been selected, Do a basic select and add to Query Metadata selected columns
                     String query = SelectSingleCol(nameColVariable);
                     DataTable dataTable = QueryHolder.howDoISelect(query);
-                    //continue here
+                    //TODO load data
+
+
+                    return realVariable;
 
                 }
             }
@@ -96,9 +100,12 @@ namespace DynamicQuery
         public string getFullTable()
         {
             String queryOutput = BaseTable;
-            foreach (JoinTable joinTable in JoinTables.Values)
+            if (JoinTables != null)
             {
-                queryOutput += joinTable.TableName + joinTable.getConditions();
+                foreach (JoinTable joinTable in JoinTables.Values)
+                {
+                    queryOutput += " " + joinTable.JoinType + " " + joinTable.TableName + joinTable.getConditions();
+                }
             }
             return queryOutput;
 
@@ -108,6 +115,21 @@ namespace DynamicQuery
         {
             //NOT YET IMPLEMENTED
             return "GET EFFICIENT TABLE NOT YET IMPLEMENTED";
+        }
+
+        public void addJoinTable(JoinTable joinTable)
+        {
+            if (joinTable != null)
+            {
+                if (JoinTables == null)
+                {
+                    JoinTables = new Dictionary<string, JoinTable>();
+                }
+                if (!JoinTables.ContainsKey(joinTable.TableName))
+                {
+                    this.JoinTables[joinTable.TableName] = joinTable;
+                }
+            }
         }
     }
 
@@ -128,12 +150,37 @@ namespace DynamicQuery
 
         public string JoinType { get; set; }
 
-        public List<string> JoinConditions { get; set; }
+        public List<string> JoinConditions { get; set; } = new List<string>();
 
         //LIST OF JOIN CONSTANTS
         public const string LEFT_JOIN = "Left Join";
         public const string RIGHT_JOIN = "Right Join";
         public const string INNER_JOIN = "Inner Join";
+
+        public JoinTable(string tableName, QueryMetadata qmd)
+        {
+            this.TableName = tableName;
+            this.Metadata = qmd;
+            this.Metadata.addJoinTable(this);
+        }
+
+        public JoinTable(string tableName, string joinType, QueryMetadata qmd)
+        {
+            this.TableName = tableName;
+            this.JoinType = joinType;
+            this.Metadata = qmd;
+            this.Metadata.addJoinTable(this);
+            if (true)
+            {
+                
+            }
+        }
+
+        public JoinTable(string tableName, string joinType)
+        {
+            this.TableName = tableName;
+            this.JoinType = joinType;
+        }
 
         //Join Conditions
 
@@ -171,7 +218,7 @@ namespace DynamicQuery
 
         public string getConditions()
         {
-            String queryJoinConditions = "ON ";
+            String queryJoinConditions = " ON ";
             foreach (String joinCondition in JoinConditions)
             {
                 queryJoinConditions += joinCondition + " ";
